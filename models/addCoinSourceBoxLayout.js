@@ -48,16 +48,9 @@ export let AddCoinSourceBoxLayout = GObject.registerClass(
       });
       hbox.add_child(changeSourceBtn);
 
-      this.isActiveChangeSource = false;
-      changeSourceBtn.connect('clicked', (self) => {
-        this.isActiveChangeSource = !this.isActiveChangeSource;
-        this.changeSourceIcon.icon_name = (this.isActiveChangeSource) ? 'go-down-symbolic' : 'go-next-symbolic';
-        if (this.isActiveChangeSource) {
-          this.add_child(this._scrollView);
-        } else {
-          this.remove_child(this._scrollView)
-        }
-      });
+      this.isActiveChangeSource = true;
+      this.add_child(this._scrollView);
+      // Remove the connect clicked event for collapsing
 
       this.sourceSection = new St.BoxLayout({
         vertical: true,

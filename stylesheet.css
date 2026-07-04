@@ -93,3 +93,8 @@
 .sources-scrollview {
   margin: 4px 0;
 }
+
+/* Profit & Loss Colors */
+.crypto-change { font-size: 0.9em; min-width: 55px; }
+.crypto-up { color: #2ecc71; }
+.crypto-down { color: #e74c3c; }

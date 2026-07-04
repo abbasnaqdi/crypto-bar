@@ -67,6 +67,13 @@ export let CoinMenuItem = GObject.registerClass(
       });
       this.add_child(this.priceLbl);
 
+      this.changeLbl = new St.Label({
+        text: '',
+        style_class: 'itemLabel text-align-right crypto-change',
+        y_align: Clutter.ActorAlign.CENTER,
+      });
+      this.add_child(this.changeLbl);
+
       this._statusBtn = new St.Button({
         x_align: Clutter.ActorAlign.START,
         // x_expand: true,
@@ -163,13 +170,23 @@ export let CoinMenuItem = GObject.registerClass(
     }
     async _refreshPrice(menuItem) {
       try {
-        let price = await this._getPrice();
+        let result = await this._getPrice();
         if (this._isDestroyed) return;
-        if (!price) return; // if error happened, not change current price.
+        if (!result || !result.price) return; // if error happened, not change current price.
 
-        this.current_price = price;
+        this.current_price = result.price;
+        this.current_change = result.change;
         this.nameLbl.text = `${this.title || this.symbol}`;
-        this.priceLbl.text = `${price}`;
+        this.priceLbl.text = `${result.price}`;
+
+        if (result.change !== undefined && result.change !== 0) {
+           let sign = result.change > 0 ? '+' : '';
+           let colorClass = result.change > 0 ? 'crypto-up' : 'crypto-down';
+           this.changeLbl.text = `${sign}${result.change.toFixed(2)}%`;
+           this.changeLbl.style_class = `itemLabel text-align-right crypto-change ${colorClass}`;
+        } else {
+           this.changeLbl.text = '';
+        }
 
         if (this.activeCoin) {
           this._updateMenuCoinItems(menuItem, false);
@@ -226,7 +243,10 @@ export let CoinMenuItem = GObject.registerClass(
     _updateMenuCoinItems(menuItem, isInit) {
       let activeCoins = this.coins.filter(({ activeCoin }) => activeCoin);
       let newMenuItemText = activeCoins
-        .map((coin) => `${coin.title || coin.symbol} ${coin.current_price || '...'}`)
+        .map((coin) => {
+           let changeStr = coin.current_change ? ` (${coin.current_change > 0 ? '+' : ''}${coin.current_change.toFixed(1)}%)` : '';
+           return `${coin.title || coin.symbol} ${coin.current_price || '...'}${changeStr}`;
+        })
         .join(' | ');
 
       if (isInit)

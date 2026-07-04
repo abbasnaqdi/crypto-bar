@@ -26,29 +26,35 @@ export let get_exchange = () => {
 };
 
 export let getPrice = async function (name, vol, exchange) {
-  let price;
+  let result;
 
   switch (exchange) {
     case exchanges.binance:
-      price = await BinanceClient._getPrice(name, vol);
+      result = await BinanceClient._getPrice(name, vol);
       break;
     case exchanges.coingecko:
-      price = await CoingeckoClient._getPrice(name, vol);
+      result = await CoingeckoClient._getPrice(name, vol);
       break;
     case exchanges.crypto:
-      price = await CryptoClient._getPrice(name, vol);
+      result = await CryptoClient._getPrice(name, vol);
       break;
     case exchanges.okx:
-      price = await OkxClient._getPrice(name, vol);
+      result = await OkxClient._getPrice(name, vol);
       break;
   }
 
-  let { maximumFractionDigits, minimumFractionDigits } = _fractionDigits(price);
+  if (!result || typeof result !== 'object') {
+    return { price: result || 'Error', change: 0 };
+  }
 
-  return price.toLocaleString('en-US', {
+  let { maximumFractionDigits, minimumFractionDigits } = _fractionDigits(result.price);
+
+  const formattedPrice = Number(result.price).toLocaleString('en-US', {
     maximumFractionDigits,
     minimumFractionDigits,
   });
+
+  return { price: formattedPrice, change: result.change };
 };
 
 export let getChartUrl = (symbol, exchange) => {
