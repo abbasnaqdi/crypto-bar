@@ -52,12 +52,12 @@ export let AddCoinMenuItem = GObject.registerClass(
       });
       hbox.add_child(this.coinTitle);
 
-      let saveIcon = new St.Icon({
-        icon_name: 'media-floppy-symbolic',
+      this.saveIcon = new St.Icon({
+        icon_name: 'list-add-symbolic',
         style_class: 'popup-menu-icon',
       });
       let addBtn = new St.Button({
-        child: saveIcon,
+        child: this.saveIcon,
         style_class: 'crypto-input btn',
       });
       addBtn.connect(
@@ -114,6 +114,9 @@ export let AddCoinMenuItem = GObject.registerClass(
 
       this.coinTitle.text = '';
       this.coinSymbol.text = '';
+      if (this.saveIcon) {
+        this.saveIcon.icon_name = 'list-add-symbolic';
+      }
     }
   }
 );

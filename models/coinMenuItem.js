@@ -268,6 +268,9 @@ export let CoinMenuItem = GObject.registerClass(
         addCoinMenu.editing_id = this.id;
         addCoinMenu.coinSymbol.text = this.symbol;
         addCoinMenu.coinTitle.text = this.title || '';
+        if (addCoinMenu.saveIcon) {
+          addCoinMenu.saveIcon.icon_name = 'document-save-symbolic';
+        }
         
         // Open the parent SubMenuMenuItem if possible
         if (addCoinMenu._parent && addCoinMenu._parent.setOpenState) {

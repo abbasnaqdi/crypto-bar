@@ -32,23 +32,7 @@ export let AddCoinSourceBoxLayout = GObject.registerClass(
       });
       hbox.add_child(expander);
 
-      let changeSourceHbox = new St.BoxLayout({
-        x_expand: true,
-      });
 
-      this.changeSourceIcon = new St.Icon({
-        icon_name: 'go-next-symbolic',
-        style_class: 'popup-menu-icon',
-      });
-      changeSourceHbox.add_child(this.changeSourceIcon);
-
-      let changeSourceBtn = new St.Button({
-        child: changeSourceHbox,
-        style_class: 'crypto-input btn',
-      });
-      hbox.add_child(changeSourceBtn);
-
-      this.isActiveChangeSource = true;
 
       this.sourceSection = new St.BoxLayout({
         vertical: true,

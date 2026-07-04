@@ -76,8 +76,6 @@
 /* Scale down icons for a compact aesthetic */
 .exchange-icon {
   background-size: contain;
-  background-position: center;
-  background-repeat: no-repeat;
   height: 16px;
   width: 16px;
   margin-right: 4px;

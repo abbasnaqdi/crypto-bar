@@ -78,12 +78,19 @@ const Indicator = GObject.registerClass(
     _buildAddCoinSection(Me) {
       this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
 
-      let addCoinBtnMenu = new PopupMenu.PopupSubMenuMenuItem('Add New Pair');
-      addCoinBtnMenu.add_style_class_name('add-coin-btn');
-      this.menu.addMenuItem(addCoinBtnMenu);
+      let addCoinTitleItem = new PopupMenu.PopupBaseMenuItem({
+        reactive: false,
+        can_focus: false,
+      });
+      let titleLabel = new St.Label({
+        text: 'Add / Edit Pair',
+        style_class: 'add-coin-title',
+      });
+      addCoinTitleItem.add_child(titleLabel);
+      this.menu.addMenuItem(addCoinTitleItem);
 
       this.addCoinSubMenu = new AddCoinMenuItem(this, Me);
-      addCoinBtnMenu.menu.addMenuItem(this.addCoinSubMenu);
+      this.menu.addMenuItem(this.addCoinSubMenu);
     }
 
     _buildCoinsSection() {
