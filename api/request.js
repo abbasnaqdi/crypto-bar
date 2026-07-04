@@ -1,6 +1,9 @@
 import Soup from 'gi://Soup';
 import GLib from 'gi://GLib';
 
+let _sessionV3 = null;
+let _sessionV2 = null;
+
 export function get(url) {
   switch (Soup.MAJOR_VERSION) {
     case 2:
@@ -12,24 +15,34 @@ export function get(url) {
 
 function get_soup_v3(url) {
   return new Promise((resolve, reject) => {
-    let session = new Soup.Session();
+    if (!_sessionV3) {
+      _sessionV3 = new Soup.Session();
+      _sessionV3.timeout = 10;
+    }
 
     let message = Soup.Message.new('GET', url);
 
-    session.send_and_read_async(
+    _sessionV3.send_and_read_async(
       message,
       GLib.PRIORITY_DEFAULT,
       null,
       function (session, result) {
         if (message.status_code === 200) {
-          let bytes = session.send_and_read_finish(result);
-          let decoder = new TextDecoder('utf-8');
-          let response = decoder.decode(bytes.get_data());
+          try {
+            let bytes = session.send_and_read_finish(result);
+            let decoder = new TextDecoder('utf-8');
+            let response = decoder.decode(bytes.get_data());
 
-          resolve({
-            code: message.status_code,
-            body: response,
-          });
+            resolve({
+              code: message.status_code,
+              body: response,
+            });
+          } catch (e) {
+            resolve({
+              code: message.status_code,
+              body: null,
+            });
+          }
         } else {
           resolve({
             code: message.status_code,
@@ -43,16 +56,18 @@ function get_soup_v3(url) {
 
 function get_soup_v2(url) {
   return new Promise((resolve, reject) => {
-    let session = new Soup.SessionAsync();
-    Soup.Session.prototype.add_feature.call(
-      session,
-      new Soup.ProxyResolverDefault()
-    );
+    if (!_sessionV2) {
+      _sessionV2 = new Soup.SessionAsync();
+      Soup.Session.prototype.add_feature.call(
+        _sessionV2,
+        new Soup.ProxyResolverDefault()
+      );
+      _sessionV2.timeout = 10;
+    }
 
     let message = Soup.Message.new('GET', url);
 
-    session.queue_message(message, function (_httpSession, result) {
-      // request is done
+    _sessionV2.queue_message(message, function (_httpSession, result) {
       resolve({
         code: result.status_code,
         body: message.response_body.data,
