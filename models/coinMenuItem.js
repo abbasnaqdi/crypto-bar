@@ -1,5 +1,4 @@
 // noinspection DuplicatedCode
-import Atk from 'gi://Atk';
 import Clutter from 'gi://Clutter';
 import GLib from 'gi://GLib';
 import GObject from 'gi://GObject';
@@ -33,7 +32,6 @@ export let CoinMenuItem = GObject.registerClass(
       this.add_style_class_name('popup-submenu-menu-item');
       this._switch = new PopupMenu.Switch(this.activeCoin);
 
-      this.accessible_role = Atk.Role.CHECK_MENU_ITEM;
       this.checkAccessibleState();
 
       let viewIcon = new St.Icon({
@@ -190,15 +188,7 @@ export let CoinMenuItem = GObject.registerClass(
     }
 
     checkAccessibleState() {
-      switch (this.accessible_role) {
-        case Atk.Role.CHECK_MENU_ITEM:
-          if (this._switch.state)
-            this.add_accessible_state(Atk.StateType.CHECKED);
-          else this.remove_accessible_state(Atk.StateType.CHECKED);
-          break;
-        default:
-          this.remove_accessible_state(Atk.StateType.CHECKED);
-      }
+      // Atk is removed in newer GNOME versions. We can safely ignore these state updates.
     }
 
     toggleCoin(menuItem) {

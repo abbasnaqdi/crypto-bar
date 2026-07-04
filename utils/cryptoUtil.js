@@ -1,7 +1,6 @@
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 
 import Gio from 'gi://Gio';
-import * as Config from 'resource:///org/gnome/shell/misc/config.js';
 
 let coingecko_data = null;
 
@@ -20,11 +19,8 @@ let _get_coingecko_data = async (Me) => {
     });
   });
 
-  let contentsString = '';
-  if (+Config.PACKAGE_VERSION >= 41) {
-    const decoder = new TextDecoder('utf-8');
-    contentsString = decoder.decode(contents);
-  }
+  const decoder = new TextDecoder('utf-8');
+  let contentsString = decoder.decode(contents);
 
   coingecko_data = JSON.parse(contentsString);
   return coingecko_data;
@@ -44,7 +40,7 @@ export let coingecko_symbol_to_id = async (symbol, Me) => {
 
 export let getHeight = (vboxHeight) => {
   const ratio = 0.4;
-  const monitor = global.display.get_primary_monitor();
+  const monitor = Main.layoutManager.primaryIndex;
   const workAreaHeight =
     Main.layoutManager.getWorkAreaForMonitor(monitor).height;
   const maxHeight = ratio * workAreaHeight;

@@ -25,7 +25,7 @@ export let AddCoinMenuItem = GObject.registerClass(
         x_expand: true,
       });
 
-      this.actor.add_child(vbox);
+      this.add_child(vbox);
 
       let sourceBoxLayout = new AddCoinSourceBoxLayout(this);
       vbox.add_child(sourceBoxLayout);
