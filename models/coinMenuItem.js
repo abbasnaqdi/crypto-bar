@@ -241,19 +241,9 @@ export let CoinMenuItem = GObject.registerClass(
     }
 
     _updateMenuCoinItems(menuItem, isInit) {
-      let activeCoins = this.coins.filter(({ activeCoin }) => activeCoin);
-      let newMenuItemText = activeCoins
-        .map((coin) => {
-           let changeStr = coin.current_change ? ` (${coin.current_change > 0 ? '+' : ''}${coin.current_change.toFixed(1)}%)` : '';
-           return `${coin.title || coin.symbol} ${coin.current_price || '...'}${changeStr}`;
-        })
-        .join(' | ');
-
-      if (isInit)
-        newMenuItemText +=
-          (newMenuItemText ? ' | ' : '') + `${this.title || this.symbol} ...`;
-
-      menuItem.text = newMenuItemText || '₿';
+      if (this.panelMenu && typeof this.panelMenu._updateTopPanelText === 'function') {
+        this.panelMenu._updateTopPanelText();
+      }
     }
 
     _delCoin(menuItem) {

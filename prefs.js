@@ -104,5 +104,44 @@ export default class CryptoTrackerPreferences extends ExtensionPreferences {
       'value',
       Gio.SettingsBindFlags.DEFAULT
     );
+
+    // Panel Display Mode
+    const displayModeRow = new Adw.ComboRow({
+      title: 'Top Panel Display Mode',
+      subtitle: 'Static shows all coins, Ticker rotates through them',
+      model: Gtk.StringList.new(['Static', 'Ticker']),
+    });
+    group.add(displayModeRow);
+
+    const displayModes = ['static', 'ticker'];
+    let currentMode = settings.get_string('panel-display-mode');
+    displayModeRow.selected = Math.max(0, displayModes.indexOf(currentMode));
+
+    displayModeRow.connect('notify::selected', () => {
+      settings.set_string('panel-display-mode', displayModes[displayModeRow.selected]);
+    });
+
+    // Ticker Interval
+    const tickerIntervalRow = new Adw.ActionRow({
+      title: 'Ticker Rotation Speed (Seconds)',
+      subtitle: 'How long to show each coin before rotating',
+    });
+    const tickerIntervalSpin = new Gtk.SpinButton({
+      valign: Gtk.Align.CENTER,
+      adjustment: new Gtk.Adjustment({
+        lower: 1,
+        upper: 60,
+        step_increment: 1,
+      }),
+    });
+    tickerIntervalRow.add_suffix(tickerIntervalSpin);
+    tickerIntervalRow.activatable_widget = tickerIntervalSpin;
+    group.add(tickerIntervalRow);
+    settings.bind(
+      'ticker-interval',
+      tickerIntervalSpin,
+      'value',
+      Gio.SettingsBindFlags.DEFAULT
+    );
   }
 }

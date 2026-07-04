@@ -183,3 +183,13 @@ export let get_font_size = () => {
     return 0;
   }
 };
+
+export let get_panel_display_mode = () => {
+  const settings = _getSettings();
+  return settings.get_string('panel-display-mode');
+};
+
+export let get_ticker_interval = () => {
+  const settings = _getSettings();
+  return settings.get_int('ticker-interval');
+};

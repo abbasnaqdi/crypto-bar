@@ -19,6 +19,7 @@
 import GObject from 'gi://GObject';
 import St from 'gi://St';
 import Clutter from 'gi://Clutter';
+import GLib from 'gi://GLib';
 
 import { Extension as Ex } from 'resource:///org/gnome/shell/extensions/extension.js';
 
@@ -115,6 +116,58 @@ const Indicator = GObject.registerClass(
         let _coin = new CoinMenuItem(coin, this.menuItem, this.coins, this);
         this.coins.push(_coin);
       }
+      this._startTicker();
+    }
+
+    _startTicker() {
+      this._stopTicker();
+      this.tickerIndex = 0;
+      let displayMode = Settings.get_panel_display_mode();
+      if (displayMode === 'ticker') {
+        let interval = Settings.get_ticker_interval() || 5;
+        this.tickerTimeout = GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT, interval, () => {
+          this._updateTopPanelText();
+          return true;
+        });
+      }
+      this._updateTopPanelText();
+    }
+
+    _stopTicker() {
+      if (this.tickerTimeout) {
+        GLib.source_remove(this.tickerTimeout);
+        this.tickerTimeout = 0;
+      }
+    }
+
+    _updateTopPanelText() {
+      let activeCoins = this.coins.filter(({ activeCoin }) => activeCoin);
+      if (activeCoins.length === 0) {
+        this.menuItem.text = '₿';
+        return;
+      }
+
+      let displayMode = Settings.get_panel_display_mode();
+
+      if (displayMode === 'ticker') {
+        this.tickerIndex = (this.tickerIndex || 0) % activeCoins.length;
+        let coin = activeCoins[this.tickerIndex];
+        let changeStr = coin.current_change ? ` (${coin.current_change > 0 ? '+' : ''}${coin.current_change.toFixed(1)}%)` : '';
+        this.menuItem.text = `${coin.title || coin.symbol} ${coin.current_price || '...'}${changeStr}`;
+        this.tickerIndex++;
+      } else {
+        this.menuItem.text = activeCoins
+          .map((coin) => {
+             let changeStr = coin.current_change ? ` (${coin.current_change > 0 ? '+' : ''}${coin.current_change.toFixed(1)}%)` : '';
+             return `${coin.title || coin.symbol} ${coin.current_price || '...'}${changeStr}`;
+          })
+          .join(' | ');
+      }
+    }
+
+    destroy() {
+      this._stopTicker();
+      super.destroy();
     }
   },
 );

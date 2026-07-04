@@ -32,5 +32,15 @@
     <key type="i" name="font-size">
       <default>0</default>
     </key>
+    <key type="s" name="panel-display-mode">
+      <default>'static'</default>
+      <choices>
+        <choice value="static" />
+        <choice value="ticker" />
+      </choices>
+    </key>
+    <key type="i" name="ticker-interval">
+      <default>5</default>
+    </key>
   </schema>
 </schemalist>
