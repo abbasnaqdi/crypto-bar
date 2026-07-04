@@ -6,7 +6,7 @@ export let NobitexClient = {
       let isIrt = vol.toLowerCase() === 'irt';
       let mappedVol = isIrt ? 'rls' : vol.toLowerCase();
       
-      const url = `https://api.nobitex.ir/market/stats?srcCurrency=${name.toLowerCase()}&dstCurrency=${mappedVol}`;
+      const url = `https://apiv2.nobitex.ir/market/stats?srcCurrency=${name.toLowerCase()}&dstCurrency=${mappedVol}`;
       const res = await get(url);
 
       const jsonRes = JSON.parse(res.body);
