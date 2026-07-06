@@ -6,6 +6,7 @@ export let CryptoClient = {
       const url = 'https://api.crypto.com/v2/public/get-ticker?instrument_name=';
       const res = await get(url + name + '_' + vol);
 
+      if (!res.body) throw new Error('No body');
       const jsonRes = JSON.parse(res.body);
       if (!jsonRes.result || !jsonRes.result.data || jsonRes.result.data.length === 0) return { price: 'Error', change: 0 };
 

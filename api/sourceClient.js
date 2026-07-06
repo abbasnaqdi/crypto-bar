@@ -46,6 +46,8 @@ export let getPrice = async function (name, vol, exchange) {
     case exchanges.nobitex:
       result = await NobitexClient._getPrice(name, vol);
       break;
+    default:
+      return { price: 'Error', change: 0 };
   }
 
   if (!result || typeof result !== 'object' || result.price === 'Error' || isNaN(Number(result.price))) {
@@ -100,9 +102,12 @@ function _fractionDigits(price) {
   } else if (price < 1 && price >= 0.1) {
     maximumFractionDigits = 4;
     minimumFractionDigits = 4;
-  } else if (price < 0.1) {
+  } else if (price < 0.1 && price > 0) {
     maximumFractionDigits = 5;
     minimumFractionDigits = 5;
+  } else if (price <= 0) {
+    maximumFractionDigits = 2;
+    minimumFractionDigits = 2;
   }
 
   return { maximumFractionDigits, minimumFractionDigits };

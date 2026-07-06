@@ -6,6 +6,7 @@ export let BinanceClient = {
       const url = 'https://api.binance.com/api/v3/ticker/24hr?symbol=';
       const res = await get(url + name + vol);
 
+      if (!res.body) throw new Error('No body');
       const jsonRes = JSON.parse(res.body);
       if (jsonRes.code) return { price: jsonRes.msg.slice(0, 30) + '...', change: 0 };
 

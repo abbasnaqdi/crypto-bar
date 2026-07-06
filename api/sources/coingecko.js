@@ -8,6 +8,7 @@ export let CoingeckoClient = {
 
       name = name.toLowerCase();
       vol = vol.toLowerCase();
+      if (!res.body) throw new Error('No body');
       const jsonRes = JSON.parse(res.body);
 
       if (Object.keys(jsonRes).length === 0) return { price: 'Not found', change: 0 };

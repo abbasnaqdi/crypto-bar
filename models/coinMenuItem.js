@@ -231,7 +231,7 @@ export let CoinMenuItem = GObject.registerClass(
       try {
         let result = await this._getPrice();
         if (this._isDestroyed) return false;
-        if (!result || !result.price) return false;
+        if (!result || result.price === undefined || result.price === null) return false;
 
         let isError = (result.price === '...' || result.price === 'Error');
 
@@ -352,7 +352,7 @@ export let CoinMenuItem = GObject.registerClass(
       let chartUrl = '';
       try {
         chartUrl = SourceClient.getChartUrl(
-          this.coingecko_id || this.symbol,
+          this.exchange === SourceClient.exchanges.coingecko && this.coingecko_id ? this.coingecko_id : this.symbol,
           this.exchange,
         );
         Gio.app_info_launch_default_for_uri(chartUrl, null);

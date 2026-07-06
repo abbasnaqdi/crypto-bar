@@ -9,6 +9,7 @@ export let NobitexClient = {
       const url = `https://apiv2.nobitex.ir/market/stats?srcCurrency=${name.toLowerCase()}&dstCurrency=${mappedVol}`;
       const res = await get(url);
 
+      if (!res.body) throw new Error('No body');
       const jsonRes = JSON.parse(res.body);
 
       if (jsonRes.status !== 'ok') return { price: 'Error', change: 0 };
@@ -20,7 +21,7 @@ export let NobitexClient = {
       let stats = jsonRes.stats[key];
       
       if (!stats) {
-          stats = Object.values(jsonRes.stats)[0];
+          return { price: 'Error', change: 0 };
       }
 
       if (!stats) return { price: 'Error', change: 0 };
@@ -48,7 +49,7 @@ export let NobitexClient = {
   _getChartUrl(symbol) {
     let exchangeUrl = 'https://nobitex.ir/trade';
     // Replace / with - and replace irt with rls because Nobitex uses rls for trade charts
-    let formattedPair = symbol.toLowerCase().replace('/', '-').replace('irt', 'rls');
+    let formattedPair = symbol.toLowerCase().replace('/', '-').replace(/irt$/, 'rls');
 
     return `${exchangeUrl}/${formattedPair}`;
   }

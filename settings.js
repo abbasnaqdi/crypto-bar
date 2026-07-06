@@ -1,18 +1,27 @@
 import { Extension } from 'resource:///org/gnome/shell/extensions/extension.js';
 
+let _cachedSettings = null;
 
 function _getSettings() {
+  if (_cachedSettings) return _cachedSettings;
   let extensionObject = Extension.lookupByUUID('crypto@abbasnaqdi.com');
+  _cachedSettings = extensionObject.getSettings();
+  return _cachedSettings;
+}
 
-  return extensionObject.getSettings();
+export function destroy() {
+  _cachedSettings = null;
 }
 
 export let getCoins = function () {
   const settings = _getSettings();
-
   let coinJsonStr = String(settings.get_string('coins'));
-  let coinJson = JSON.parse(coinJsonStr);
-  return coinJson.coins;
+  try {
+    let coinJson = JSON.parse(coinJsonStr);
+    return coinJson.coins || [];
+  } catch (e) {
+    return [];
+  }
 };
 
 export let addCoin = function ({
@@ -73,7 +82,7 @@ export let setCoinId = function (coin) {
   const coins = getCoins();
 
   for (const _coin of coins) {
-    if (_coin.symbol === coin.symbol) {
+    if (_coin.symbol === coin.symbol && !_coin.id) {
       _coin.id = coin.id;
     }
   }
@@ -88,7 +97,7 @@ export let updateCoin = function (coin) {
     if (_coin.id === coin.id) {
       _coin.active = Boolean(coin.active);
       _coin.title = coin.title;
-      _coin.symbol = coin.symbol;
+      _coin.symbol = coin.symbol.toUpperCase();
       _coin.exchange = coin.exchange;
       if (coin.coingecko_id !== undefined) _coin.coingecko_id = coin.coingecko_id;
     }

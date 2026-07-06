@@ -6,12 +6,13 @@ export let OkxClient = {
       const url = 'https://www.okx.com/api/v5/market/ticker?instId=';
       const res = await get(url + name + '-' + vol);
 
+      if (!res.body) throw new Error('No body');
       const jsonRes = JSON.parse(res.body);
 
       if (jsonRes.data && jsonRes.data.length > 0) {
         const price = +jsonRes.data[0].last;
         const open = +jsonRes.data[0].sodUtc0;
-        const change = ((price - open) / open) * 100;
+        const change = open === 0 ? 0 : ((price - open) / open) * 100;
         return { price, change };
       }
       return { price: 'Error', change: 0 };

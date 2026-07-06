@@ -25,6 +25,7 @@ import { Extension as Ex } from 'resource:///org/gnome/shell/extensions/extensio
 
 import * as SourceClient from './api/sourceClient.js';
 import * as CryptoUtil from './utils/cryptoUtil.js';
+import * as Request from './api/request.js';
 
 import * as Settings from './settings.js';
 import { CoinMenuItem } from './models/coinMenuItem.js';
@@ -289,5 +290,7 @@ export default class Extension extends Ex {
     this._indicator = null;
     this._settings = null;
     CryptoUtil.destroy();
+    Request.destroy();
+    Settings.destroy();
   }
 }

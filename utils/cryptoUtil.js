@@ -36,6 +36,7 @@ export let coingecko_symbol_to_id = async (symbol, Me) => {
   } catch (error) {
     console.log(error);
   }
+  return '';
 };
 
 export let getHeight = (vboxHeight) => {

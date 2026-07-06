@@ -5,12 +5,27 @@ import Gio from 'gi://Gio';
 let _sessionV3 = null;
 let _sessionV2 = null;
 
+const _decoder = new TextDecoder('utf-8');
+
 export function get(url) {
   switch (Soup.MAJOR_VERSION) {
     case 2:
       return get_soup_v2(url);
     case 3:
       return get_soup_v3(url);
+    default:
+      return Promise.reject(new Error('Unsupported Soup version'));
+  }
+}
+
+export function destroy() {
+  if (_sessionV3) {
+    _sessionV3.abort();
+    _sessionV3 = null;
+  }
+  if (_sessionV2) {
+    _sessionV2.abort();
+    _sessionV2 = null;
   }
 }
 
@@ -57,8 +72,7 @@ function get_soup_v3(url) {
 
         if (message.status_code === 200 && bytes) {
           try {
-            let decoder = new TextDecoder('utf-8');
-            let response = decoder.decode(bytes.get_data());
+            let response = _decoder.decode(bytes.get_data());
 
             resolve({
               code: message.status_code,
@@ -105,7 +119,7 @@ function get_soup_v2(url) {
       return GLib.SOURCE_REMOVE;
     });
 
-    _sessionV2.queue_message(message, function (_httpSession, result) {
+    _sessionV2.queue_message(message, function (_httpSession, _message) {
       if (resolved) return;
       resolved = true;
       if (timeoutId) {
@@ -113,8 +127,8 @@ function get_soup_v2(url) {
         timeoutId = 0;
       }
       resolve({
-        code: result.status_code,
-        body: message.response_body.data,
+        code: _message.status_code,
+        body: _message.response_body.data,
       });
     });
   });
