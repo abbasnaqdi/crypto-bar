@@ -1,5 +1,6 @@
 import Soup from 'gi://Soup';
 import GLib from 'gi://GLib';
+import Gio from 'gi://Gio';
 
 let _sessionV3 = null;
 let _sessionV2 = null;
@@ -22,17 +23,29 @@ function get_soup_v3(url) {
     }
 
     let message = Soup.Message.new('GET', url);
+    let cancellable = new Gio.Cancellable();
+
+    let timeoutId = GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT, 10, () => {
+      cancellable.cancel();
+      timeoutId = 0;
+      return GLib.SOURCE_REMOVE;
+    });
 
     _sessionV3.send_and_read_async(
       message,
       GLib.PRIORITY_DEFAULT,
-      null,
+      cancellable,
       function (session, result) {
+        if (timeoutId) {
+          GLib.source_remove(timeoutId);
+          timeoutId = 0;
+        }
+
         let bytes = null;
         try {
           bytes = session.send_and_read_finish(result);
         } catch (e) {
-          // If network is unreachable, finish() will throw an error.
+          // If network is unreachable or cancelled, finish() will throw an error.
         }
 
         if (message.status_code === 200 && bytes) {

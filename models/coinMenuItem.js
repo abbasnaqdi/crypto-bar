@@ -22,11 +22,11 @@ export let CoinMenuItem = GObject.registerClass(
       });
 
       this.id = coin.id;
-      this.symbol = coin.symbol;
-      this.coingecko_id = coin.coingecko_id;
-      this.activeCoin = Boolean(coin.active);
-      this.title = coin.title;
       this.exchange = coin.exchange;
+      this.coingecko_id = coin.coingecko_id;
+      this.activeCoin = coin.active !== undefined ? Boolean(coin.active) : true;
+      this.title = coin.title;
+      this.symbol = coin.symbol;
       this.coins = coins;
       this.panelMenu = panelMenu;
       this.current_price = '...';
