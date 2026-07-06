@@ -8,15 +8,16 @@ export let OkxClient = {
 
       const jsonRes = JSON.parse(res.body);
 
-      if (jsonRes.data.length > 0) {
+      if (jsonRes.data && jsonRes.data.length > 0) {
         const price = +jsonRes.data[0].last;
         const open = +jsonRes.data[0].sodUtc0;
         const change = ((price - open) / open) * 100;
         return { price, change };
       }
-      return { price: -1, change: 0 };
+      return { price: 'Error', change: 0 };
     } catch (error) {
       console.debug(error);
+      return { price: 'Error', change: 0 };
     }
   },
 

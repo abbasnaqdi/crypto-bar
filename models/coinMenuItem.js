@@ -178,7 +178,7 @@ export let CoinMenuItem = GObject.registerClass(
 
     _startTimer(menuItem) {
       this.removeTimer();
-      this._currentRetryInterval = 10;
+      this._currentRetryInterval = 5;
       this._scheduleNextFetch(menuItem, true);
     }
 
@@ -206,15 +206,15 @@ export let CoinMenuItem = GObject.registerClass(
       let success = await this._refreshPrice(menuItem);
       if (this._isDestroyed) return;
 
-      let userInterval = Settings.get_update_interval() || 10;
-      if (userInterval < 10) userInterval = 10; // optimal minimum
+      let userInterval = Settings.get_update_interval() || 5;
+      if (userInterval < 5) userInterval = 5; // optimal minimum
 
       if (success) {
         this._currentRetryInterval = userInterval;
       } else {
         if (this._currentRetryInterval < userInterval) {
            this._currentRetryInterval = Math.min(this._currentRetryInterval * 2, userInterval);
-           if (this._currentRetryInterval < 10) this._currentRetryInterval = 10;
+           if (this._currentRetryInterval < 5) this._currentRetryInterval = 5;
         } else {
            this._currentRetryInterval = userInterval;
         }

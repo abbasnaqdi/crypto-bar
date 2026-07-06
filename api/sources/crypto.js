@@ -7,13 +7,14 @@ export let CryptoClient = {
       const res = await get(url + name + '_' + vol);
 
       const jsonRes = JSON.parse(res.body);
-      if (jsonRes.result?.data.length === 0) return { price: -1, change: 0 };
+      if (!jsonRes.result || !jsonRes.result.data || jsonRes.result.data.length === 0) return { price: 'Error', change: 0 };
 
       const price = +jsonRes.result.data[0].a;
       const change = (+jsonRes.result.data[0].c) * 100; // Crypto.com gives fraction, convert to percentage
       return { price, change };
     } catch (error) {
-      console.debug( error);
+      console.debug(error);
+      return { price: 'Error', change: 0 };
     }
   },
 

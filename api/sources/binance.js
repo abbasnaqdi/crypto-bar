@@ -14,6 +14,7 @@ export let BinanceClient = {
       return { price, change };
     } catch (error) {
       console.debug(error);
+      return { price: 'Error', change: 0 };
     }
   },
 
