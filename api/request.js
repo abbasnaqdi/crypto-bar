@@ -82,7 +82,7 @@ function get_soup_v2(url) {
         _sessionV2,
         new Soup.ProxyResolverDefault()
       );
-      _sessionV2.timeout = 10;
+      _sessionV2.timeout = 5;
       _sessionV2.user_agent = 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/112.0';
     }
 

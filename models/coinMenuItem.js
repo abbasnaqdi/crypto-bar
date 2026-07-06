@@ -3,6 +3,7 @@ import Clutter from 'gi://Clutter';
 import GLib from 'gi://GLib';
 import GObject from 'gi://GObject';
 import St from 'gi://St';
+import Gio from 'gi://Gio';
 
 import * as SourceClient from '../api/sourceClient.js';
 import * as Settings from '../settings.js';
@@ -348,7 +349,7 @@ export let CoinMenuItem = GObject.registerClass(
           this.coingecko_id || this.symbol,
           this.exchange,
         );
-        Util.spawnCommandLine(`xdg-open ${chartUrl}`);
+        Gio.app_info_launch_default_for_uri(chartUrl, null);
       } catch (err) {
         let title = `Can not open ${chartUrl}`;
         Main.notifyError(title, err);
@@ -356,6 +357,7 @@ export let CoinMenuItem = GObject.registerClass(
     }
 
     destroy() {
+      if (this._isDestroyed) return;
       this._isDestroyed = true;
       this.removeTimer();
       super.destroy();
