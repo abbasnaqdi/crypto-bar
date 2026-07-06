@@ -30,8 +30,6 @@ export let CoinMenuItem = GObject.registerClass(
       this.coins = coins;
       this.panelMenu = panelMenu;
       this.current_price = '...';
-      this.historyData = [];
-      this._historyFetched = false;
       this._isDestroyed = false;
 
       this.add_style_class_name('popup-submenu-menu-item');
@@ -62,41 +60,6 @@ export let CoinMenuItem = GObject.registerClass(
         x_expand: true,
       });
       this.add_child(expander);
-
-      this.sparkline = new St.DrawingArea({
-        style_class: 'sparkline',
-        x_expand: false,
-        y_expand: false,
-        width: 45,
-        height: 18,
-        margin_right: 8
-      });
-      this.sparkline.connect('repaint', (area) => {
-        if (!this.historyData || this.historyData.length < 2) return;
-        
-        let cr = area.get_context();
-        let [width, height] = area.get_surface_size();
-        
-        let min = Math.min(...this.historyData);
-        let max = Math.max(...this.historyData);
-        let range = max - min;
-        if (range === 0) range = 1;
-        
-        cr.setLineWidth(1.5);
-        let color = (this.current_change && this.current_change >= 0) ? [0.18, 0.76, 0.49] : [0.88, 0.1, 0.14];
-        cr.setSourceRGBA(color[0], color[1], color[2], 1.0);
-        
-        let step = width / (this.historyData.length - 1);
-        let padY = 2;
-        let drawHeight = height - padY * 2;
-        
-        cr.moveTo(0, padY + (range === 0 ? drawHeight / 2 : drawHeight - ((this.historyData[0] - min) / range) * drawHeight));
-        for (let i = 1; i < this.historyData.length; i++) {
-          cr.lineTo(i * step, padY + (range === 0 ? drawHeight / 2 : drawHeight - ((this.historyData[i] - min) / range) * drawHeight));
-        }
-        cr.stroke();
-      });
-      this.add_child(this.sparkline);
 
       this.priceLbl = new St.Label({
         text: '...',
@@ -262,16 +225,6 @@ export let CoinMenuItem = GObject.registerClass(
 
     async _refreshPrice(menuItem) {
       try {
-        if (!this._historyFetched) {
-          this._historyFetched = true;
-          let parts = this.symbol.split('/');
-          let namePart = this.exchange === SourceClient.exchanges.coingecko ? this.coingecko_id : parts[0];
-          let hData = await SourceClient.getHistory(namePart, parts[1], this.exchange);
-          if (hData && hData.length > 0) {
-            this.historyData = hData.filter(v => typeof v === 'number' && !isNaN(v));
-          }
-        }
-
         let result = await this._getPrice();
         if (this._isDestroyed) return false;
         if (!result || !result.price) return false;
@@ -282,12 +235,6 @@ export let CoinMenuItem = GObject.registerClass(
         this.current_change = result.change;
         this.nameLbl.text = `${this.title || this.symbol}`;
         this.priceLbl.text = `${result.price}`;
-
-        if (!isError && result.rawPrice !== undefined && result.rawPrice !== 'Error') {
-          this.historyData.push(result.rawPrice);
-          if (this.historyData.length > 24) this.historyData.shift();
-          if (this.sparkline) this.sparkline.queue_repaint();
-        }
 
         if (!isError && result.change !== undefined && result.change !== 0) {
            let sign = result.change > 0 ? '+' : '';

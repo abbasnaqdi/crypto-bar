@@ -21,18 +21,6 @@ export let OkxClient = {
     }
   },
 
-  async _getHistory(name, vol) {
-    try {
-      const url = `https://www.okx.com/api/v5/market/candles?instId=${name}-${vol}&bar=1H&limit=24`;
-      const res = await get(url);
-      const jsonRes = JSON.parse(res.body);
-      if (!jsonRes.data) return [];
-      return jsonRes.data.map(d => parseFloat(d[4])).reverse();
-    } catch (error) {
-      return [];
-    }
-  },
-
   _getChartUrl(symbol) {
     let exchangeUrl = 'https://www.okx.com/markets/spot-info';
     let formattedPair = symbol.replace('/', '-').toLowerCase();

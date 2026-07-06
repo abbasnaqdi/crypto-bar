@@ -18,18 +18,6 @@ export let CryptoClient = {
     }
   },
 
-  async _getHistory(name, vol) {
-    try {
-      const url = `https://api.crypto.com/v2/public/get-candlestick?instrument_name=${name}_${vol}&timeframe=1h`;
-      const res = await get(url);
-      const jsonRes = JSON.parse(res.body);
-      if (!jsonRes.result || !jsonRes.result.data) return [];
-      return jsonRes.result.data.map(d => parseFloat(d.c));
-    } catch (error) {
-      return [];
-    }
-  },
-
   _getChartUrl(symbol) {
     let exchangeUrl = 'https://crypto.com/exchange/trade';
     let formattedPair = symbol.replace('/', '_').toUpperCase();

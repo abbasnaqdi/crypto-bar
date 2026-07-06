@@ -18,18 +18,6 @@ export let BinanceClient = {
     }
   },
 
-  async _getHistory(name, vol) {
-    try {
-      const url = `https://api.binance.com/api/v3/klines?symbol=${name}${vol}&interval=1h&limit=24`;
-      const res = await get(url);
-      const jsonRes = JSON.parse(res.body);
-      if (jsonRes.code) return [];
-      return jsonRes.map(k => parseFloat(k[4]));
-    } catch (error) {
-      return [];
-    }
-  },
-
   _getChartUrl(symbol) {
     let exchangeUrl = 'https://www.binance.com/en/trade';
     let formattedPair = symbol.replace('/', '_').toUpperCase();

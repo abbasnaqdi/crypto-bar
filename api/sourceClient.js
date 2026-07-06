@@ -59,24 +59,7 @@ export let getPrice = async function (name, vol, exchange) {
     minimumFractionDigits,
   });
 
-  return { price: formattedPrice, change: result.change, rawPrice: result.price };
-};
-
-export let getHistory = async function (name, vol, exchange) {
-  switch (exchange) {
-    case exchanges.binance:
-      return await BinanceClient._getHistory(name, vol);
-    case exchanges.coingecko:
-      return await CoingeckoClient._getHistory(name, vol);
-    case exchanges.crypto:
-      return await CryptoClient._getHistory(name, vol);
-    case exchanges.okx:
-      return await OkxClient._getHistory(name, vol);
-    case exchanges.nobitex:
-      return await NobitexClient._getHistory(name, vol);
-    default:
-      return [];
-  }
+  return { price: formattedPrice, change: result.change };
 };
 
 export let getChartUrl = (symbol, exchange) => {

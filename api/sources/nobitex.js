@@ -45,25 +45,6 @@ export let NobitexClient = {
     }
   },
 
-  async _getHistory(name, vol) {
-    try {
-      let isIrt = vol.toLowerCase() === 'irt';
-      let mappedVol = isIrt ? 'rls' : vol.toLowerCase();
-      let to = Math.floor(Date.now() / 1000);
-      let from = to - (24 * 60 * 60);
-      const url = `https://apiv2.nobitex.ir/market/udf/history?symbol=${name.toUpperCase()}${mappedVol.toUpperCase()}&resolution=60&from=${from}&to=${to}`;
-      const res = await get(url);
-      const jsonRes = JSON.parse(res.body);
-      if (jsonRes.s !== 'ok' || !jsonRes.c) return [];
-      
-      let prices = jsonRes.c;
-      if (isIrt) prices = prices.map(p => p / 10);
-      return prices;
-    } catch (error) {
-      return [];
-    }
-  },
-
   _getChartUrl(symbol) {
     let exchangeUrl = 'https://nobitex.ir/trade';
     // Replace / with - and replace irt with rls because Nobitex uses rls for trade charts
