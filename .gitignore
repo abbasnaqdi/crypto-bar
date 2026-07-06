@@ -1,1 +1,3 @@
-*.zip.codegraph/
+*.zip
+.codegraph/
+fix_dconf.js
