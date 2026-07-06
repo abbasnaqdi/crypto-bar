@@ -18,7 +18,7 @@ function get_soup_v3(url) {
   return new Promise((resolve, reject) => {
     if (!_sessionV3) {
       _sessionV3 = new Soup.Session();
-      _sessionV3.timeout = 5;
+      _sessionV3.timeout = 15;
       _sessionV3.user_agent = 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/112.0';
     }
 
@@ -26,7 +26,7 @@ function get_soup_v3(url) {
     let cancellable = new Gio.Cancellable();
     let resolved = false;
 
-    let timeoutId = GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT, 5, () => {
+    let timeoutId = GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT, 15, () => {
       if (resolved) return GLib.SOURCE_REMOVE;
       resolved = true;
       cancellable.cancel();
@@ -88,14 +88,14 @@ function get_soup_v2(url) {
         _sessionV2,
         new Soup.ProxyResolverDefault()
       );
-      _sessionV2.timeout = 5;
+      _sessionV2.timeout = 15;
       _sessionV2.user_agent = 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/112.0';
     }
 
     let message = Soup.Message.new('GET', url);
     let resolved = false;
 
-    let timeoutId = GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT, 5, () => {
+    let timeoutId = GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT, 15, () => {
       if (resolved) return GLib.SOURCE_REMOVE;
       resolved = true;
       _sessionV2.cancel_message(message, Soup.Status.CANCELLED);
