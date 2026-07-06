@@ -22,6 +22,20 @@ export let CoingeckoClient = {
     }
   },
 
+  async _getHistory(name, vol) {
+    try {
+      name = name.toLowerCase();
+      vol = vol.toLowerCase();
+      const url = `https://api.coingecko.com/api/v3/coins/${name}/market_chart?vs_currency=${vol}&days=1`;
+      const res = await get(url);
+      const jsonRes = JSON.parse(res.body);
+      if (!jsonRes.prices) return [];
+      return jsonRes.prices.map(p => p[1]);
+    } catch (error) {
+      return [];
+    }
+  },
+
   _getChartUrl(symbol) {
     let exchangeUrl = 'https://www.coingecko.com/en/coins';
     let formattedPair = symbol.toLowerCase();
