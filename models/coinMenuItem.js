@@ -218,7 +218,7 @@ export let CoinMenuItem = GObject.registerClass(
         let maxBackoff = 60; // Cap error retries to 60 seconds max
         if (this._currentRetryInterval < maxBackoff) {
            this._currentRetryInterval = Math.min(this._currentRetryInterval * 2, maxBackoff);
-           if (this._currentRetryInterval < 5) this._currentRetryInterval = 5;
+           if (this._currentRetryInterval < 10) this._currentRetryInterval = 10;
         } else {
            this._currentRetryInterval = maxBackoff;
         }
@@ -307,11 +307,11 @@ export let CoinMenuItem = GObject.registerClass(
     }
 
     _updateMenuCoinItems(menuItem, isInit) {
-      if (this.panelMenu && typeof this.panelMenu._updateTopPanelText === 'function') {
-        this.panelMenu._updateTopPanelText();
-      }
       if (!isInit && this.panelMenu && typeof this.panelMenu._sortCoinsByChange === 'function') {
         this.panelMenu._sortCoinsByChange();
+      }
+      if (this.panelMenu && typeof this.panelMenu._updateTopPanelText === 'function') {
+        this.panelMenu._updateTopPanelText();
       }
     }
 

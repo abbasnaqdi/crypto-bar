@@ -208,9 +208,9 @@ const Indicator = GObject.registerClass(
       if (!reordered) return;
 
       this.coins = sorted;
-      for (const coin of sorted) this.coinsScrollViewVbox.remove_child(coin);
-      for (const coin of sorted) this.coinsScrollViewVbox.add_child(coin);
-      this._updateTopPanelText();
+      for (let i = 0; i < sorted.length; i++) {
+        this.coinsScrollViewVbox.set_child_at_index(sorted[i], i);
+      }
     }
 
     destroy() {
