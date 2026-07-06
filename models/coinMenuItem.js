@@ -175,38 +175,83 @@ export let CoinMenuItem = GObject.registerClass(
     }
 
     _startTimer(menuItem) {
-      this._refreshPrice(menuItem);
-
-      let interval = Settings.get_update_interval() || 10;
-      this.timeOutTag = GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT, interval, () => {
-        this._refreshPrice(menuItem);
-        return true;
-      });
+      this.removeTimer();
+      this._currentRetryInterval = 10;
+      this._scheduleNextFetch(menuItem, true);
     }
+
+    _scheduleNextFetch(menuItem, isImmediate = false) {
+      this.removeTimer();
+
+      if (isImmediate) {
+        this.timeOutTag = GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT, 0, () => {
+          this.timeOutTag = 0;
+          this._doFetchAndReschedule(menuItem);
+          return GLib.SOURCE_REMOVE;
+        });
+      } else {
+        this.timeOutTag = GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT, this._currentRetryInterval, () => {
+          this.timeOutTag = 0;
+          this._doFetchAndReschedule(menuItem);
+          return GLib.SOURCE_REMOVE;
+        });
+      }
+    }
+
+    async _doFetchAndReschedule(menuItem) {
+      if (this._isDestroyed) return;
+      
+      let success = await this._refreshPrice(menuItem);
+      if (this._isDestroyed) return;
+
+      let userInterval = Settings.get_update_interval() || 10;
+      if (userInterval < 10) userInterval = 10; // optimal minimum
+
+      if (success) {
+        this._currentRetryInterval = userInterval;
+      } else {
+        if (this._currentRetryInterval < userInterval) {
+           this._currentRetryInterval = Math.min(this._currentRetryInterval * 2, userInterval);
+           if (this._currentRetryInterval < 10) this._currentRetryInterval = 10;
+        } else {
+           this._currentRetryInterval = userInterval;
+        }
+      }
+
+      this._scheduleNextFetch(menuItem, false);
+    }
+
     async _refreshPrice(menuItem) {
       try {
         let result = await this._getPrice();
-        if (this._isDestroyed) return;
-        if (!result || !result.price) return; // if error happened, not change current price.
+        if (this._isDestroyed) return false;
+        if (!result || !result.price) return false;
+
+        let isError = (result.price === '...');
 
         this.current_price = result.price;
         this.current_change = result.change;
         this.nameLbl.text = `${this.title || this.symbol}`;
         this.priceLbl.text = `${result.price}`;
 
-        if (result.change !== undefined && result.change !== 0) {
+        if (!isError && result.change !== undefined && result.change !== 0) {
            let sign = result.change > 0 ? '+' : '';
            let colorClass = result.change > 0 ? 'crypto-up' : 'crypto-down';
            this.changeLbl.text = `${sign}${result.change.toFixed(2)}%`;
            this.changeLbl.style_class = `itemLabel text-align-right crypto-change ${colorClass}`;
         } else {
            this.changeLbl.text = '';
+           this.changeLbl.style_class = 'itemLabel text-align-right crypto-change';
         }
 
         if (this.activeCoin) {
           this._updateMenuCoinItems(menuItem, false);
         }
-      } catch (error) {}
+        
+        return !isError;
+      } catch (error) {
+        return false;
+      }
     }
     get state() {
       return this._switch.state;
